@@ -41,13 +41,22 @@ except ImportError:
     # use an arbitrary other Exception
     AuthenticationError = socket.error
 
-try:
-    from pycam import VERSION
-except ImportError:
+def useLocal():
     # running locally (without a proper PYTHONPATH) requires manual intervention
-    sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                                     os.pardir)))
+    filePath = os.path.dirname(os.path.realpath(__file__))
+    basePath = os.path.join(filePath, os.pardir)
+    sys.path.insert(0, os.path.normpath(basePath))
+    print("PATH: {}".format("\n\t".join(sys.path)))
     from pycam import VERSION
+
+if "-local" in sys.argv:
+    useLocal()
+    sys.argv.remove("-local")
+else:
+    try:
+        from pycam import VERSION
+    except ImportError:
+        useLocal()
 
 from pycam import GenericError
 import pycam.Exporters.GCodeExporter
